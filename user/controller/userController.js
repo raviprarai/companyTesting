@@ -1,4 +1,5 @@
 const userDb = require("../model/userModel")
+const bookModel = require("../../admin/model/bookModel")
 const { userSchema, userLogin, userEditSchema, image } = require("../../validators/allValidators")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -165,9 +166,9 @@ exports.editProfileImage = async (req, res) => {
         })
     }
 }
-exports.showProfile=async(req,res)=>{
+exports.showProfile = async (req, res) => {
     try {
-        const result=await userDb.findById(req.user._id)
+        const result = await userDb.findById(req.user._id)
         if (!result) {
             return res.status(404).json({
                 status: 0,
@@ -178,12 +179,88 @@ exports.showProfile=async(req,res)=>{
                 status: 1,
                 message: "User Data Founded",
                 result
-            })  
+            })
         }
     } catch (error) {
         return res.status(500).json({
             status: 0,
             message: error.message
+        })
+    }
+}
+exports.userGetBookList = async (req, res) => {
+    try {
+        const result = await bookModel.find().populate("category author").sort("-createdAt")
+        if (!result[0]) {
+            return res.status(404).json({
+                status: 0,
+                message: "Data Not Founded"
+            })
+        } else {
+            return res.status(200).json({
+                status: 1,
+                message: "Data Founded",
+                result
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.toString()
+        })
+    }
+}
+exports.getOneBook = async (req, res) => {
+    try {
+        const result = await bookModel.findById(req.params.id).populate("category author");
+        if (!result) {
+            return res.status(404).json({
+                status: 0,
+                message: "Data Not Found"
+            })
+        } else {
+            return res.status(200).json({
+                status: 1,
+                message: "Data Founded",
+                result
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.toString()
+        })
+    }
+}
+exports.searchByBook = async (req, res) => {
+    try {
+        const key = req.body.key;
+        const data = {
+            $or: [
+                { publisher: { $regex: new RegExp(key, "i") } },
+                { publiction_year: { $regex: new RegExp(key, "i") } },
+                { bookName: { $regex: new RegExp(key, "i") } },
+                { alternateTitle: { $regex: new RegExp(key, "i") } }
+            ],
+        };
+        const result = await bookModel.find(data).populate("category author");
+        //   const totalCount = await userModel.countDocuments(data, dateCondition);
+        if (!result) {
+            return res.status(404).json({
+                status: 0,
+                message: "Data Not Founded"
+            })
+        } else {
+            return res.status(200).json({
+                status: 1,
+                message: "Book Founded Successfully",
+                result
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.toString()
         })
     }
 }

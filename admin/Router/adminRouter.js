@@ -16,5 +16,13 @@ router.get("/getAllAuthor",verifyTokenAndAdmin, adminRouter.getAllAuthor);
 router.put("/updateAuthor",verifyTokenAndAdmin, adminRouter.updateAuthor);
 router.get("/getOneAuthor/:id",verifyTokenAndAdmin, adminRouter.getOneAuthor);
 router.delete("/deletedAuthor/:id",verifyTokenAndAdmin, adminRouter.deletedAuthor);
+router.post("/bookCategory",verifyTokenAndAdmin, adminRouter.bookCategory);
+router.get("/getAllbookCategory",verifyTokenAndAdmin, adminRouter.getAllbookCategory);
+router.delete("/deletedBookCategory/:id",verifyTokenAndAdmin, adminRouter.deletedBookCategory);
+router.post("/addBook",verifyTokenAndAdmin, adminRouter.addBook);
+router.get("/getAllbook",verifyTokenAndAdmin, adminRouter.getAllbook);
+router.put("/updateBook",verifyTokenAndAdmin, adminRouter.updateBook);
+router.get("/getOneBook/:id",verifyTokenAndAdmin, adminRouter.getOneBook);
+router.delete("/deletedBook/:id",verifyTokenAndAdmin, adminRouter.deletedBook);
 
 module.exports = router;

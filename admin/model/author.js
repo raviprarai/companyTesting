@@ -13,6 +13,12 @@ const authorSchema = new mongoose.Schema(
     biography: {
       type: String,
     },
+    book: [
+      {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "book"
+      }
+  ],
   },
   { timestamps: true }
 );

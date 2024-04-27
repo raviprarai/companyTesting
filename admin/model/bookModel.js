@@ -1,12 +1,18 @@
 const mongoose = require("mongoose");
 const bookSchema = new mongoose.Schema(
     {
-        title: {
+        bookName: {
+            type: String,
+        },
+        alternateTitle: {
             type: String,
         },
         author: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "author"
+        },
+        publisher: {
+            type: String,
         },
         stock: {
             type: Boolean,
@@ -15,9 +21,18 @@ const bookSchema = new mongoose.Schema(
         description: {
             type: String,
         },
-        category: {
-            type: String,
-        },
+        category: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "bookCategory"
+            }
+        ],
+        transactions: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "bookTranstion"
+            }
+        ],
         publiction_year: {
             type: String,
         },
@@ -30,8 +45,10 @@ const bookSchema = new mongoose.Schema(
         edition: {
             type: String,
         },
-        synopsis: {
+        bookStatus: {
             type: String,
+            enum: ["available", "unavailable"],
+            default: "available"
         },
     },
     { timestamps: true }

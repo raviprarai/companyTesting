@@ -38,7 +38,23 @@ const author = Joi.object({
     nationality:Joi.string().required(),
     biography:Joi.string().required()
 });
+const category = Joi.object({
+    category_Name:Joi.string().required()
+});
+const book = Joi.object({
+    bookName: Joi.string().required(),
+    alternateTitle:Joi.string().required(),
+    author:Joi.string().required(),
+    publisher:Joi.string().required(),
+    description:Joi.string().required(),
+    category:Joi.string().required(),
+    publiction_year:Joi.string().required(),
+    language:Joi.string().required(),
+    pages:Joi.number().required(),
+    edition:Joi.string().required()
+
+});
 module.exports = {
-    userSchema,userLogin,userEditSchema,image,admin,author
+    userSchema,userLogin,userEditSchema,image,admin,author,category,book
 
 };

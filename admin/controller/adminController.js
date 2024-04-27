@@ -1,7 +1,10 @@
 const adminModel = require("../model/adminModel")
 const userModel = require("../../user/model/userModel")
 const authorModel = require("../model/author")
-const { admin,author } = require("../../validators/allValidators")
+const bookModel = require("../model/bookModel")
+const categoryModel = require("../model/bookCategory")
+const transtionDb=require("../model/bookTransation")
+const { admin, author, category,book } = require("../../validators/allValidators")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 exports.adminSignup = async (req, res) => {
@@ -217,10 +220,10 @@ exports.addAuthor = async (req, res) => {
       return res.status(400).json({ message: error.details[0].message });
     } else {
       const result = await authorModel.create({
-        author_name:req.body.author_name,
+        author_name: req.body.author_name,
         dob: req.body.dob,
-        nationality:req.body.nationality,
-        biography:req.body.biography
+        nationality: req.body.nationality,
+        biography: req.body.biography
       });
       return res.status(200).json({
         status: 1,
@@ -235,25 +238,25 @@ exports.addAuthor = async (req, res) => {
     });
   }
 };
-exports.getAllAuthor=async(req,res)=>{
+exports.getAllAuthor = async (req, res) => {
   try {
-    const result=await authorModel.find().sort("-createdAt")
+    const result = await authorModel.find().populate("book").sort("-createdAt")
     if (!result[0]) {
       return res.status(404).json({
-        status:0,
-        message:"Data Not Founded"
+        status: 0,
+        message: "Data Not Founded"
       })
     } else {
       return res.status(200).json({
-        status:1,
-        message:"Data Founded",
+        status: 1,
+        message: "Data Founded",
         result
       })
     }
   } catch (error) {
     return res.status(500).json({
-      status:0,
-      message:error.toString()
+      status: 0,
+      message: error.toString()
     })
   }
 }
@@ -311,6 +314,205 @@ exports.deletedAuthor = async (req, res) => {
       })
     } else {
       const result = await authorModel.findByIdAndDelete(req.params.id);
+      return res.status(200).json({
+        status: 1,
+        message: "Data Deleted Successfully",
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+
+exports.bookCategory = async (req, res) => {
+  try {
+    const { error } = category.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    } else {
+      const exist = await categoryModel.exists({ category_Name: req.body.category_Name });
+      if (exist) {
+        return res
+          .status(400)
+          .json({ message: "This category_Name is already taken!" });
+      }
+      const result = await categoryModel.create({
+        category_Name: req.body.category_Name
+      })
+      return res.status(200).json({
+        status: 1,
+        message: "Admin add category sucessfully",
+        result
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      status: 0,
+      message: err.toString(),
+    });
+  }
+};
+exports.getAllbookCategory = async (req, res) => {
+  try {
+    const result = await categoryModel.find().populate("book").sort("-createdAt")
+    if (!result[0]) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      return res.status(200).json({
+        status: 1,
+        message: "Data Founded",
+        result
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+exports.deletedBookCategory = async (req, res) => {
+  try {
+    const data = await categoryModel.findById(req.params.id);
+    if (!data) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      const result = await categoryModel.findByIdAndDelete(req.params.id);
+      return res.status(200).json({
+        status: 1,
+        message: "Data Deleted Successfully",
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+
+exports.addBook = async (req, res) => {
+  try {
+    const { error } = book.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    } else {
+      const result = await bookModel.create({
+        bookName: req.body.bookName,
+        alternateTitle:req.body.alternateTitle,
+        author:req.body.author,
+        publisher:req.body.publisher,
+        description:req.body.description,
+        category:req.body.category,
+        publiction_year:req.body.publiction_year,
+        language:req.body.language,
+        pages:req.body.pages,
+        edition:req.body.edition
+      })
+      await categoryModel.findByIdAndUpdate({_id:req.body.category},{$push:{book:result._id}},{new:true})
+      await authorModel.findByIdAndUpdate({_id:req.body.author},{$push:{book:result._id}},{new:true})
+
+      return res.status(200).json({
+        status: 1,
+        message: "Admin add book sucessfully",
+        result
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      status: 0,
+      message: err.toString(),
+    });
+  }
+};
+exports.getAllbook = async (req, res) => {
+  try {
+    const result = await bookModel.find().populate("category author").sort("-createdAt")
+    if (!result[0]) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      return res.status(200).json({
+        status: 1,
+        message: "Data Founded",
+        result
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+exports.updateBook = async (req, res) => {
+  try {
+    const data = await bookModel.findById(req.body.id);
+    if (!data) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      const updatedData = await bookModel.findByIdAndUpdate(req.body.id, { $set: req.body }, { new: true })
+      return res.status(200).json({
+        status: 1,
+        message: "Update Successfully"
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+exports.getOneBook = async (req, res) => {
+  try {
+    const result = await bookModel.findById(req.params.id).populate("category author");
+    if (!result) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Found"
+      })
+    } else {
+      return res.status(200).json({
+        status: 1,
+        message: "Data Founded",
+        result
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+exports.deletedBook = async (req, res) => {
+  try {
+    const data = await bookModel.findById(req.params.id);
+    if (!data) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      await authorModel.findByIdAndUpdate({_id:data.author},{$pull:{book:data._id}},{new:true})
+      await categoryModel.findByIdAndUpdate({_id:data.category},{$pull:{book:data._id}},{new:true})
+
+      const result = await bookModel.findByIdAndDelete(req.params.id);
       return res.status(200).json({
         status: 1,
         message: "Data Deleted Successfully",

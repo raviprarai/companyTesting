@@ -14,6 +14,9 @@ router.post("/userLogin", userRouter.userLogin);
 router.put("/editProfile", verifyTokenAndUser,userRouter.editProfile);
 router.put("/editProfileImage", verifyTokenAndUser,upload.single('image'),userRouter.editProfileImage);
 router.get("/showProfile", verifyTokenAndUser,userRouter.showProfile);
+router.get("/userGetBookList",verifyTokenAndUser, userRouter.userGetBookList);
+router.get("/getOneBook/:id",verifyTokenAndUser, userRouter.getOneBook);
+router.post("/searchByBook",verifyTokenAndUser, userRouter.searchByBook);
 
 
 module.exports = router;
