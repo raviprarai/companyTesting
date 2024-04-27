@@ -32,7 +32,13 @@ const admin = Joi.object({
     email: Joi.string().email().required(),
     password:Joi.string().required()
 });
+const author = Joi.object({
+    author_name: Joi.string().required(),
+    dob:Joi.string().required(),
+    nationality:Joi.string().required(),
+    biography:Joi.string().required()
+});
 module.exports = {
-    userSchema,userLogin,userEditSchema,image,admin
+    userSchema,userLogin,userEditSchema,image,admin,author
 
 };

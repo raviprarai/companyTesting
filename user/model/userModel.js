@@ -38,6 +38,10 @@ const UserSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
         },
+        fines:{
+            type:Number,
+            default:0
+        }
     },
     { timestamps: true }
 );

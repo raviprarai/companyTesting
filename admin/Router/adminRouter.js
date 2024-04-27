@@ -11,10 +11,10 @@ router.post("/userListAPI",verifyTokenAndAdmin, adminRouter.userListAPI);
 router.put("/updateUserData",verifyTokenAndAdmin, adminRouter.updateUserData);
 router.get("/getOneUser/:id",verifyTokenAndAdmin, adminRouter.getOneUser);
 router.delete("/deletedProfile/:id",verifyTokenAndAdmin, adminRouter.deletedProfile);
-
-
-
-
-
+router.post("/addAuthor",verifyTokenAndAdmin, adminRouter.addAuthor);
+router.get("/getAllAuthor",verifyTokenAndAdmin, adminRouter.getAllAuthor);
+router.put("/updateAuthor",verifyTokenAndAdmin, adminRouter.updateAuthor);
+router.get("/getOneAuthor/:id",verifyTokenAndAdmin, adminRouter.getOneAuthor);
+router.delete("/deletedAuthor/:id",verifyTokenAndAdmin, adminRouter.deletedAuthor);
 
 module.exports = router;
