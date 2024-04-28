@@ -52,9 +52,13 @@ const book = Joi.object({
     language:Joi.string().required(),
     pages:Joi.number().required(),
     edition:Joi.string().required()
-
+});
+const bookTransations = Joi.object({
+    bookId: Joi.string().required(),
+    fromDate:Joi.string().required(),
+    toDate:Joi.string().required(),
 });
 module.exports = {
-    userSchema,userLogin,userEditSchema,image,admin,author,category,book
+    userSchema,userLogin,userEditSchema,image,admin,author,category,book,bookTransations
 
 };

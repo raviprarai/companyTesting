@@ -24,5 +24,11 @@ router.get("/getAllbook",verifyTokenAndAdmin, adminRouter.getAllbook);
 router.put("/updateBook",verifyTokenAndAdmin, adminRouter.updateBook);
 router.get("/getOneBook/:id",verifyTokenAndAdmin, adminRouter.getOneBook);
 router.delete("/deletedBook/:id",verifyTokenAndAdmin, adminRouter.deletedBook);
+router.get("/getAllBookTransation",verifyTokenAndAdmin, adminRouter.getAllBookTransation);
+router.delete("/deletedBookTransation/:id",verifyTokenAndAdmin, adminRouter.deletedBookTransation);
+router.post("/addBookFines",verifyTokenAndAdmin, adminRouter.addBookFines);
+router.get("/getAllBookTransationActive",verifyTokenAndAdmin, adminRouter.getAllBookTransationActive);
+router.get("/getAllBookTransationInActive",verifyTokenAndAdmin, adminRouter.getAllBookTransationInActive);
+router.get("/getAllBookFines",verifyTokenAndAdmin, adminRouter.getAllBookFines);
 
 module.exports = router;

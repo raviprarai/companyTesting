@@ -17,6 +17,9 @@ router.get("/showProfile", verifyTokenAndUser,userRouter.showProfile);
 router.get("/userGetBookList",verifyTokenAndUser, userRouter.userGetBookList);
 router.get("/getOneBook/:id",verifyTokenAndUser, userRouter.getOneBook);
 router.post("/searchByBook",verifyTokenAndUser, userRouter.searchByBook);
+router.post("/addBookTransation",verifyTokenAndUser, userRouter.addBookTransation);
+router.get("/myIssueBook",verifyTokenAndUser, userRouter.myIssueBook);
+router.put("/returnBook",verifyTokenAndUser, userRouter.returnBook);
 
 
 module.exports = router;

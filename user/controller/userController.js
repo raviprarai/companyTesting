@@ -1,6 +1,8 @@
 const userDb = require("../model/userModel")
 const bookModel = require("../../admin/model/bookModel")
-const { userSchema, userLogin, userEditSchema, image } = require("../../validators/allValidators")
+const bookTransation = require("../../admin/model/bookTransation")
+
+const { userSchema, userLogin, userEditSchema, image, bookTransations } = require("../../validators/allValidators")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const commonfunction = require("../../middlewares/fileUpload")
@@ -188,6 +190,8 @@ exports.showProfile = async (req, res) => {
         })
     }
 }
+
+
 exports.userGetBookList = async (req, res) => {
     try {
         const result = await bookModel.find().populate("category author").sort("-createdAt")
@@ -261,6 +265,94 @@ exports.searchByBook = async (req, res) => {
         return res.status(500).json({
             status: 0,
             message: error.toString()
+        })
+    }
+}
+
+exports.addBookTransation = async (req, res) => {
+    try {
+        const { error } = bookTransations.validate(req.body);
+        if (error) {
+            return res.status(400).json({ message: error.details[0].message });
+        } else {
+            const bookData = await bookModel.findById({ _id: req.body.bookId })
+            if (!bookData) {
+                return res.status(404).json({
+                    status: 0,
+                    message: "Book Not Founded",
+                });
+            }
+            const fromDate = new Date(req.body.fromDate);
+            const toDate = new Date(req.body.toDate);
+            // console.log(fromDate,toDate);
+            const result = await bookTransation.create({
+                bookId:req.body.bookId,
+                bookName: bookData?.bookName,
+                userId: req.user._id,
+                fromDate: fromDate,
+                toDate: toDate,
+            })
+            await bookModel.findByIdAndUpdate({ _id: req.body.bookId }, { $push: { transactions: result._id } }, { new: true })
+
+            return res.status(200).json({
+                status: 1,
+                message: "User Issue book sucessfully",
+                result
+            });
+        }
+    } catch (err) {
+        return res.status(500).json({
+            status: 0,
+            message: err.toString(),
+        });
+    }
+};
+exports.myIssueBook = async (req, res) => {
+    try {
+        const result = await bookTransation.find({userId:req.user._id}).populate("bookId");
+        if (!result) {
+            return res.status(404).json({
+                status: 0,
+                message: "Data Not Found"
+            })
+        } else {
+            return res.status(200).json({
+                status: 1,
+                message: "Data Founded",
+                result
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 0,
+            message: error.toString()
+        })
+    }
+}
+exports.returnBook=async(req,res)=>{
+    try {
+        const result=await bookTransation.findById(req.body.id)
+        if (!result) {
+            return res.status(404).json({
+                status:0,
+                message:"Data Not Founded"
+            })
+        } else {
+            const returnDate = new Date(req.body.returndate);
+           await bookTransation.findByIdAndUpdate(req.body.id,{
+            transactionType:"Return",
+            returnDate:returnDate,
+            transactionStatus:"Inactive"
+           },{new:true})
+           return res.status(200).json({
+            status: 1,
+            message: "User Return book sucessfully"
+        });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status:0,
+            message:error.toString()
         })
     }
 }

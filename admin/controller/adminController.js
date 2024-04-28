@@ -4,6 +4,7 @@ const authorModel = require("../model/author")
 const bookModel = require("../model/bookModel")
 const categoryModel = require("../model/bookCategory")
 const transtionDb=require("../model/bookTransation")
+const bookFinesDb = require("../model/bookFines")
 const { admin, author, category,book } = require("../../validators/allValidators")
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -516,6 +517,149 @@ exports.deletedBook = async (req, res) => {
       return res.status(200).json({
         status: 1,
         message: "Data Deleted Successfully",
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+
+exports.getAllBookTransation = async (req, res) => {
+  try {
+    const result = await transtionDb.find().populate("userId  bookId").sort("-createdAt")
+    if (!result[0]) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      return res.status(200).json({
+        status: 1,
+        message: "Data Founded",
+        result
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+exports.deletedBookTransation = async (req, res) => {
+  try {
+    const data = await transtionDb.findById(req.params.id);
+    if (!data) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      const result = await transtionDb.findByIdAndDelete(req.params.id);
+      return res.status(200).json({
+        status: 1,
+        message: "Data Deleted Successfully",
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+exports.addBookFines=async(req,res)=>{
+  try {
+    const result=await transtionDb.findById(req.body.id);
+    if (!result) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+    });
+    } else {
+      const userData=await userModel.findOne({_id:result.userId})
+      const finesDb=await bookFinesDb.create({
+        firstName:userData.firstName,
+        lastName:userData.lastName,
+        email:userData.email,
+        bookId:result.bookId,
+        userId:result.userId,
+        booKTranstion:req.body.id,
+        fines:req.body.fines
+      })
+      return res.status(200).json({
+        status: 1,
+        message: "Admin Add Fines For Issue Book",
+        result:finesDb
+    });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+  });
+  }
+}
+exports.getAllBookTransationActive = async (req, res) => {
+  try {
+    const result = await transtionDb.find({transactionStatus:"Active"}).populate("userId  bookId").sort("-createdAt")
+    if (!result[0]) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      return res.status(200).json({
+        status: 1,
+        message: "Data Founded",
+        result
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+exports.getAllBookTransationInActive = async (req, res) => {
+  try {
+    const result = await transtionDb.find({transactionStatus:"Inactive"}).populate("userId  bookId").sort("-createdAt")
+    if (!result[0]) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      return res.status(200).json({
+        status: 1,
+        message: "Data Founded",
+        result
+      })
+    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.toString()
+    })
+  }
+}
+exports.getAllBookFines = async (req, res) => {
+  try {
+    const result = await bookFinesDb.find().populate("userId  booKTranstion bookId").sort("-createdAt")
+    if (!result[0]) {
+      return res.status(404).json({
+        status: 0,
+        message: "Data Not Founded"
+      })
+    } else {
+      return res.status(200).json({
+        status: 1,
+        message: "Data Founded",
+        result
       })
     }
   } catch (error) {
